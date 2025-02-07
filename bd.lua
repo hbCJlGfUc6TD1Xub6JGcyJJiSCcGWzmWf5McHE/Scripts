@@ -1067,7 +1067,7 @@ function ManualSpam()
     IndercanotTextBlah.Selectable = false
     IndercanotTextBlah.Size = UDim2.new(0.667999983, 0, 0.346666664, 0)
     IndercanotTextBlah.Font = Enum.Font.GothamBold
-    IndercanotTextBlah.Text = "Frostware"
+    IndercanotTextBlah.Text = "StarX"
     IndercanotTextBlah.TextColor3 = Color3.fromRGB(255, 255, 255)
     IndercanotTextBlah.TextScaled = true
     IndercanotTextBlah.TextSize = 24.000
@@ -1151,7 +1151,7 @@ IndercanotTextBlah.Position = UDim2.new(0.164000005, 0, 0.326666653, 0)
 IndercanotTextBlah.Selectable = false
 IndercanotTextBlah.Size = UDim2.new(0.667999983, 0, 0.346666664, 0)
 IndercanotTextBlah.Font = Enum.Font.GothamBold
-IndercanotTextBlah.Text = "Frostware"
+IndercanotTextBlah.Text = "StarX"
 IndercanotTextBlah.TextColor3 = Color3.fromRGB(255, 255, 255)
 IndercanotTextBlah.TextScaled = true
 IndercanotTextBlah.TextSize = 24.000
