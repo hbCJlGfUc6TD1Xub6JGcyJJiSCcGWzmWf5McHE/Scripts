@@ -1895,10 +1895,10 @@ Tabs.Home:AddButton({
         Title = "Copy Discord",
         Description = "Copies the discord link",
         Callback = function()
-            setclipboard("https://discord.gg/5gE6J4Jftj")
+            setclipboard("We currently Build the server, Not Ready yet)
             Fluent:Notify({
                 Title = "Star X Hub",
-                Content = "Copied Discord Link",
+                Content = "We currently Build the server, Not Ready yet",
                 Duration = 10
             })
         end
