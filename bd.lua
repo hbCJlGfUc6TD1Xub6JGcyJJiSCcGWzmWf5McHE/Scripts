@@ -1831,6 +1831,40 @@ task.spawn(function()
     
     -- Initialize the visualizer
     create_visualizer()
+
+    local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))()
+local Notify = AkaliNotif.Notify
+
+local function checkPing()
+    while true do
+        local ping = game:GetService("Stats"):FindFirstChild("Network"):FindFirstChild("Ping").Value * 1000 -- Konversi ke ms
+        
+        if ping >= 350 and ping <= 500 then
+            Notify({
+                Description = "Your Ping Is High! Check your Connection And Restart Roblox! (" .. math.floor(ping) .. " ms)",
+                Title = "Warning!",
+                Duration = 5,
+            })
+        elseif ping >= 200 then
+            Notify({
+                Description = "Your Ping Is Mid, May Game Exprience will bad (" .. math.floor(ping) .. " ms)",
+                Title = "Warning!",
+                Duration = 5,
+            })
+        elseif ping <= 50 then
+            Notify({
+                Description = "Your Ping Is Low! Thats A Good thing! (" .. math.floor(ping) .. " ms)",
+                Title = "Warning!",
+                Duration = 5,
+            })
+        end
+        
+        wait(5) -- Cek setiap 10 detik
+    end
+end
+
+spawn(checkPing)
+
     
     --------------                    
                                            
@@ -1865,14 +1899,14 @@ task.spawn(function()
                         
     Tabs.Home:AddParagraph({
         Title = "Owner",
-        Content = "-CodeE4X"
+        Content = "-CodeE4X\n-Frostware Thanks for lib and some!"
 })
 
 Tabs.Home:AddButton({
         Title = "Copy Discord",
         Description = "Copies the discord link",
         Callback = function()
-            setclipboard("We currently Build the server, Not Ready yet)
+            setclipboard("We currently Build the server, Not Ready yet")
             Fluent:Notify({
                 Title = "Star X Hub",
                 Content = "We currently Build the server, Not Ready yet",
@@ -1883,7 +1917,7 @@ Tabs.Home:AddButton({
 
 Tabs.Home:AddParagraph({
         Title = "Why Star X Hub Get Removed For A While?",
-        Content = "So Real owner is sick(very seriously), And Get Rest 3 Month and when owner back, owner discord account get suspend 2 years because Malicious Conduct(i got got suspend 6 account💀), Instanly Star X Hub Server Got Deleted and all file gone(cuz i put file script there, *me being dumbass)"
+        Content = "So Real owner is sick(very seriously), And Get Rest 3 Month and when owner back, owner discord account get suspend 2 years because My Server Have Nazi Flag Emoji LOL(i got got suspend 6 account💀), Instanly Star X Hub Server Got Deleted and all file gone(cuz i put file script there, *me being dumbass)"
 })
            
     end                    
