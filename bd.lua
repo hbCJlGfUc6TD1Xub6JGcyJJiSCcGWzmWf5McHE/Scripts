@@ -1845,18 +1845,6 @@ local function checkPing()
                 Title = "Warning!",
                 Duration = 5,
             })
-        elseif ping >= 200 then
-            Notify({
-                Description = "Your Ping Is Mid, May Game Exprience will bad (" .. math.floor(ping) .. " ms)",
-                Title = "Warning!",
-                Duration = 5,
-            })
-        elseif ping <= 50 then
-            Notify({
-                Description = "Your Ping Is Low! Thats A Good thing! (" .. math.floor(ping) .. " ms)",
-                Title = "Warning!",
-                Duration = 5,
-            })
         end
         
         wait(5) -- Cek setiap 10 detik
