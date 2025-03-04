@@ -1832,26 +1832,7 @@ task.spawn(function()
     -- Initialize the visualizer
     create_visualizer()
 
-    local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))()
-local Notify = AkaliNotif.Notify
 
-local function checkPing()
-    while true do
-        local ping = game:GetService("Stats"):FindFirstChild("Network"):FindFirstChild("Ping").Value * 1000 -- Konversi ke ms
-        
-        if ping >= 350 and ping <= 500 then
-            Notify({
-                Description = "Your Ping Is High! Check your Connection And Restart Roblox! (" .. math.floor(ping) .. " ms)",
-                Title = "Warning!",
-                Duration = 5,
-            })
-        end
-        
-        wait(5) -- Cek setiap 10 detik
-    end
-end
-
-spawn(checkPing)
 
     
     --------------                    
