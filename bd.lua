@@ -13,7 +13,6 @@ task.spawn(function()
     local gravity_enabled = false
     local current_curve = nil
     local ai_Enabled = false
-    local auto_win = true
     local tp_hit = false
     local dymanic_curve_check_enabled = false
     local visualize_Enabled = false
@@ -88,7 +87,7 @@ task.spawn(function()
         game.Loaded:Wait()
     end
     
-    setfpscap(200)
+    setfpscap(60)
     
     local LocalPlayer = Players.LocalPlayer
     local client_id = RbxAnalyticsService:GetClientId()
@@ -1815,7 +1814,7 @@ task.spawn(function()
     
         if AiPlayType == "Legit" then
             humanoid.WalkSpeed = 35
-        elseif AiPlayType == "Hacker" then
+        elseif AiPlayType == "Blatant" then
             humanoid.WalkSpeed = AiPlaySpeed
         end
     
@@ -1858,7 +1857,7 @@ task.spawn(function()
     local Tabs = {
     Home = Window:AddTab({ Title = "Home", Icon = "home" }),
         Main = Window:AddTab({ Title = "Combat", Icon = "swords" }),
-    Farm = Window:AddTab({ Title = "Farm", Icon = "sprout" }),
+    Farm = Window:AddTab({ Title = "Farm", Icon = "box" }),
         Visual = Window:AddTab({ Title = "Visuals", Icon = "eye" }),
         Setting = Window:AddTab({ Title = "Settings", Icon = "cog" }),
     }
@@ -1913,20 +1912,36 @@ Tabs.Home:AddParagraph({
     
     
         local radwda = Tabs.Farm:AddSection("Farms 🎣")
-        local au_pary = Tabs.Farm:AddToggle("pppa",{
-            Title = "Auto Farm[BETA]", 
-            Description = "Farms the ball (you can choose what mode of the farm in settings)",
-            Default = false,
-        })
-                        
-        au_pary:OnChanged(function(v)
-            auto_win = v
-        end)
+
             
         local ai_pary = Tabs.Farm:AddToggle("pppa",{
             Title = "Ai play", 
-            Description = "Ai play (you can choose what mode of the farm in settings)",
+            Description = "Ai play ",
             Default = false,
+        })
+
+        local Dropdown = Tabs.Farm:AddDropdown("Dropdown", {
+            Title = "Ai Type",
+            Values = {"Legit", "Blatant"},
+            Multi = false,
+            Default = 1,
+        })
+    
+        Dropdown:SetValue("Legit")
+    
+        Dropdown:OnChanged(function(Value)
+            AiPlayType = Value
+        end)		
+    local Slider = Tabs.Setting:AddSlider("Slider", {
+            Title = "Blatant Speed",
+            Description = "For Blatant Mode",
+            Default = 20,
+            Min = 0,
+            Max = 300,
+            Rounding = 1,
+            Callback = function(Value)
+                AiPlaySpeed = Value
+            end
         })
                         
         ai_pary:OnChanged(function(v)
@@ -2037,29 +2052,7 @@ Tabs.Home:AddParagraph({
     
     
     do
-    local Dropdown = Tabs.Setting:AddDropdown("Dropdown", {
-            Title = "Ai Type",
-            Values = {"Legit", "Hacker"},
-            Multi = false,
-            Default = 1,
-        })
-    
-        Dropdown:SetValue("Legit")
-    
-        Dropdown:OnChanged(function(Value)
-            AiPlayType = Value
-        end)		
-    local Slider = Tabs.Setting:AddSlider("Slider", {
-            Title = "Hacker Speed",
-            Description = "This is for the Hacker mode on the Ai Play.",
-            Default = 20,
-            Min = 0,
-            Max = 300,
-            Rounding = 1,
-            Callback = function(Value)
-                AiPlaySpeed = Value
-            end
-        })   
+        local sswdqd = Tabs.Setting:AddSection("Setting")
         local dymanic_curve_check = Tabs.Setting:AddToggle("dcc",{
             Title = "Curve Detect", 
             Description = "Auto Spam",
@@ -2079,39 +2072,6 @@ Tabs.Home:AddParagraph({
     
         adjust_spam_speed:OnChanged(function(v)
             spam_speed = v
-        end)
-        local adjust_spam_sped = Tabs.Setting:AddDropdown("Asaas",{
-            Title = "Auto Farm Axis",
-            Description = "Adjust the Auto Farm Axis",
-            Values = {"X","Y","Z","XZ","XY","YX","YZ","ZX","ZY","XYZ"},
-            Multi = false,
-            Default = 10,
-        })
-    
-        adjust_spam_sped:OnChanged(function(v)
-            selected_axis = v
-        end)
-        local adjust_spam_spd = Tabs.Setting:AddDropdown("AsaAas",{
-            Title = "Auto Farm Speed",
-            Description = "Adjust the Auto Farm Axis",
-            Values = {10,20,30,40,50,60,70,80,90,100},
-            Multi = false,
-            Default = 10,
-        })
-    
-        adjust_spam_spd:OnChanged(function(v)
-            selected_speed = v
-        end)
-        local adjust_spam_sp = Tabs.Setting:AddDropdown("AsAaAas",{
-            Title = "Auto Farm Method",
-            Description = "Adjust the Auto Farm Axis",
-            Values = {"Wild","Controlled"},
-            Multi = false,
-            Default = 2,
-        })
-    
-        adjust_spam_sp:OnChanged(function(v)
-            farm_method = v
         end)
     end
                         
