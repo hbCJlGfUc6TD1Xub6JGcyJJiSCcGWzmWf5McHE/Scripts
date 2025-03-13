@@ -1869,7 +1869,13 @@ task.spawn(function()
         Title = "Owner",
         Content = "-CodeE4X\n-Frostware Thanks for lib and some!"
 })
-
+                    
+    Tabs.Home:AddParagraph({
+        Title = "WARNING BIG ANNOUNCEMENT!!!!",
+        Content = "MY GITHUB GET HACKED By One Of Black Hat Hacker(Xyb) whatever if u dont know him.
+But Pls Be Carefull If u using My Script, maybe it will Have Stealer Thinggy SHIT"
+})
+                    
 Tabs.Home:AddButton({
         Title = "Copy Discord",
         Description = "Copies the discord link",
