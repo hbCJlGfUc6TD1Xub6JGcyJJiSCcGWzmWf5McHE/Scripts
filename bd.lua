@@ -1855,12 +1855,14 @@ task.spawn(function()
           
     
     local Tabs = {
-    Home = Window:AddTab({ Title = "Home", Icon = "home" }),
+    Home = Window:AddTab({ Title = "Home(READ)", Icon = "home" }),
         Main = Window:AddTab({ Title = "Combat", Icon = "swords" }),
     Farm = Window:AddTab({ Title = "Farm", Icon = "box" }),
         Visual = Window:AddTab({ Title = "Visuals", Icon = "eye" }),
         Setting = Window:AddTab({ Title = "Settings", Icon = "cog" }),
     }
+
+    Window:SelectTab(1)
     
      do
     local r = Tabs.Home:AddSection("Info 💸")
@@ -1877,13 +1879,13 @@ But Pls Be Carefull If u using My Script, maybe it will Have Stealer Thinggy SHI
 })
                     
 Tabs.Home:AddButton({
-        Title = "Copy Discord",
+        Title = "Copy Discord(PWEASE GYASS)",
         Description = "Copies the discord link",
         Callback = function()
-            setclipboard("We currently Build the server, Not Ready yet")
+            setclipboard("https://discord.gg/b7yA7uTfmp")
             Fluent:Notify({
                 Title = "Star X Hub",
-                Content = "We currently Build the server, Not Ready yet",
+                Content = "Join Our Server To get Support",
                 Duration = 10
             })
         end
