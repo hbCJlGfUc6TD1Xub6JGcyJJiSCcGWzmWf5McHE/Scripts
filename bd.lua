@@ -1243,8 +1243,102 @@ local Tab = {
     y = Window:AddTab({ Title = "Thanks!", Icon = "star" }),
     Main = Window:AddTab({ Title = "Main", Icon = "swords" }),
     Misc = Window:AddTab({ Title = "Misc", Icon = "boxes" }),
-    Plr = Window:AddTab({ Title = "Player", Icon = "user" })
+    Plr = Window:AddTab({ Title = "Player", Icon = "user" }),
+    Rate = Window:AddTab({ Title = "Rating", Icon = "star" })
+	}
+
+-- Webhook URL (replace with your actual webhook URL)
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1356239575424438485/DQ8z5axMcCC9i-pFKMeF9X4diHIxoLs-bS3evPBYGzbXz2vhV5Tuol1mCNRyjAqDe0vv"
+
+-- Function to send rating to Discord webhook using http_request
+local function sendRatingToWebhook(rating)
+    local playerName = game:GetService("Players").LocalPlayer.Name
+    local currentTime = os.date("%Y-%m-%d %H:%M:%S")
+    
+    local data = {
+        ["embeds"] = {{
+            ["title"] = "New Rating Received",
+            ["description"] = string.format("Player: %s\nRating: %s\nTime: %s", playerName, rating, currentTime),
+            ["color"] = ({
+                Good = 65280,      -- Green
+                Basic = 16776960,  -- Yellow
+                Bad = 16711680     -- Red
+            })[rating] or 16777215, -- Default white
+            ["footer"] = {
+                ["text"] = "Rating System"
+            }
+        }}
+    }
+    
+    local encoded = game:GetService("HttpService"):JSONEncode(data)
+    
+    local success, response = pcall(function()
+        local http_request = http_request or request or (fluxus and fluxus.request) or (getgenv and getgenv().request)
+        if not http_request then
+            error("No http_request function found")
+        end
+        
+        return http_request({
+            Url = WEBHOOK_URL,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = encoded
+        })
+    end)
+    
+    if success then
+        print("Rating submitted successfully!")
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Rating Submitted",
+            Text = "Thank you for your "..rating.." rating!",
+            Duration = 5,
+            Icon = ({
+                Good = "rbxassetid://6023426923",  -- Green check
+                Basic = "rbxassetid://6022668888", -- Yellow warning
+                Bad = "rbxassetid://6023426926"    -- Red error
+            })[rating]
+        })
+    else
+        warn("Failed to send rating:", response)
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Error",
+            Text = "Failed to submit rating",
+            Duration = 5,
+            Icon = "rbxassetid://6023426926" -- Red error
+        })
+    end
+end
+
+-- Create rating buttons
+local buttons = {
+    {
+        Title = "⭐ Good Rating", 
+        Description = "Everything worked perfectly!",
+        Rating = "Good"
+    },
+    {
+        Title = "🔶 Basic Rating",
+        Description = "It worked but could be better",
+        Rating = "Basic"
+    },
+    {
+        Title = "❌ Bad Rating",
+        Description = "Had issues or didn't work",
+        Rating = "Bad"
+    }
 }
+
+for _, btn in ipairs(buttons) do
+    Tab.Rate:AddButton({
+        Title = btn.Title,
+        Description = btn.Description,
+        Callback = function()
+            sendRatingToWebhook(btn.Rating)
+        end
+    })
+end
 
 local Section = Tab.Home:AddSection("Credits")
 
