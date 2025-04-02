@@ -1602,19 +1602,73 @@ Tab.Main:AddButton({
 
 
 local LogService = game:GetService("LogService")
+local HttpService = game:GetService("HttpService")
+local lastSentMessages = {}
+local webhookUrl = "https://discord.com/api/webhooks/1356895449415548948/otz4CnqkZPmgNi5oE8F0DFnxpfnYQG6MlS_od603Fe1uEk3EkDahni2xW13Tjh3TX9vn" -- REPLACE WITH YOUR WEBHOOK
 
+-- Function to send messages to webhook
+local function sendToWebhook(messageType, message)
+    -- Generate a unique key for this message to prevent duplicates
+    local messageKey = messageType .. ":" .. message:sub(1, 50):gsub("%s", "_")
+    
+    -- Don't send if this message was sent recently
+    if lastSentMessages[messageKey] then return end
+    lastSentMessages[messageKey] = os.time()
+    
+    -- Clean up old entries
+    for key, timestamp in pairs(lastSentMessages) do
+        if os.time() - timestamp > 300 then -- 5 minute cooldown
+            lastSentMessages[key] = nil
+        end
+    end
+    
+    local executor = "Executor: " .. (identifyexecutor() or "Unknown") -- Adjust based on your executor
+    local ping = "Ping: " .. math.random(50, 150) .. "ms" -- Example ping
+    
+    local embedColor = messageType == "ERROR" and 16711680 or 16753920 -- Red for error, orange for warning
+    
+    local payload = {
+        ["content"] = executor .. "\n" .. ping .. "\n```lua\n" .. message .. "\n```\n" .. 
+                     (messageType == "ERROR" and "Error in Console!" or "Warning in Console!"),
+        ["username"] = "Console Monitor",
+        ["avatar_url"] = "https://i.imgur.com/example.png",
+        ["embeds"] = {{
+            ["color"] = embedColor,
+            ["title"] = messageType == "ERROR" and "🛑 Error Detected" or "⚠️ Warning Detected",
+            ["description"] = "```lua\n" .. message .. "\n```",
+            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
+        }}
+    }
+    
+    -- Send to webhook
+    pcall(function()
+        local jsonPayload = HttpService:JSONEncode(payload)
+        HttpService:PostAsync(webhookUrl, jsonPayload)
+    end)
+end
+
+-- Monitor console messages
 LogService.MessageOut:Connect(function(message, messageType)
     if messageType == Enum.MessageType.MessageError then
+        -- Add to UI
         Tab.Main:AddParagraph({
             Title = "🛑 Error Detected:",
             Content = message
         })
+        -- Send to webhook
+        sendToWebhook("ERROR", message)
+        
     elseif messageType == Enum.MessageType.MessageWarning then
+        -- Add to UI
         Tab.Main:AddParagraph({
             Title = "⚠️ Warning Detected:",
             Content = message
         })
+        -- Send to webhook
+        sendToWebhook("WARNING", message)
+        
     elseif messageType == Enum.MessageType.MessageOutput then
+        -- Optional: You can add regular output to UI if needed
         Tab.Main:AddParagraph({
             Title = "📢 Console Output:",
             Content = message
