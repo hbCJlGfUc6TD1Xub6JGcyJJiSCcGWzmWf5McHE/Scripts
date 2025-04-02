@@ -1528,7 +1528,14 @@ local Dropdown = Tab.Main:AddDropdown("Dropdown", {
     Multi = false,
     Default = 1,
     Callback = function(slctd)
-        Selected_Parry_Type = slctd
+        -- Ensure the selected type is valid
+        local validTypes = {"Custom", "Random", "Backwards", "Straight", "Up", "Right", "Left"}
+        if table.find(validTypes, slctd) then
+            Selected_Parry_Type = slctd
+        else
+            Selected_Parry_Type = "Custom"
+            warn("Invalid parry type selected, defaulting to Custom")
+        end
     end
 })
 
