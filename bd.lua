@@ -1,3 +1,4 @@
+
 repeat task.wait() until game:IsLoaded()
 local Players = game:GetService('Players')
 local LocalPlayer = Players.LocalPlayer
@@ -61,6 +62,128 @@ local Emotes_Data = {}
 for Object in pairs(Animation.storage) do
     table.insert(Emotes_Data, Object)
 end
+
+
+local LogService = game:GetService("LogService")
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+
+-- Config
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1357218722644754513/krN4K6vcPDEguz5MYOw0r7VCFuwcaa9gl3bIP0l_lPf8zjUJ3cic12B1CTLUCTx8Spz7"
+local MAX_ERROR_LENGTH = 1000  -- Potong error jika terlalu panjang
+local COOLDOWN = 5  -- Cooldown (detik) untuk menghindari spam webhook
+
+-- Variabel untuk cooldown
+local lastSentTime = 0
+local lastSentMessages = {}
+
+-- Fungsi untuk mendapatkan executor (jika menggunakan exploit)
+local function getExecutorInfo()
+    local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
+    local exploitVersion = (getexecutorname and getexecutorname()) or "Roblox"
+    return string.format("Executor: %s (%s)", executor, exploitVersion)
+end
+
+-- Fungsi untuk mengirim embed ke Discord
+local function sendToWebhook(errorType, message, stackTrace)
+    -- Cooldown check
+    local currentTime = os.time()
+    if currentTime - lastSentTime < COOLDOWN then
+        return
+    end
+    lastSentTime = currentTime
+
+    -- Potong pesan jika terlalu panjang
+    local truncatedMsg = string.sub(message, 1, MAX_ERROR_LENGTH)
+    if #message > MAX_ERROR_LENGTH then
+        truncatedMsg = truncatedMsg .. "\n... [truncated]"
+    end
+
+    -- Format stack trace (jika ada)
+    local traceText = stackTrace and "\n\n**Stack Trace:**\n```lua\n"..stackTrace.."\n```" or ""
+
+    -- Warna embed berdasarkan jenis error
+    local color = errorType == "ERROR" and 16711680 or  -- Merah untuk error
+                  errorType == "WARNING" and 16753920 or  -- Oranye untuk warning
+                  10181046  -- Ungu untuk lainnya
+
+    -- Data embed
+    local embed = {
+        {
+            title = "⚠️ "..errorType.." DETECTED",
+            description = "```lua\n"..truncatedMsg.."\n```"..traceText,
+            color = color,
+            fields = {
+                {
+                    name = "Player",
+                    value = "```"..Players.LocalPlayer.Name.."```",
+                    inline = true
+                },
+                {
+                    name = "Ping",
+                    value = "```"..math.floor(Players.LocalPlayer:GetNetworkPing() * 1000).."ms```",
+                    inline = true
+                },
+                {
+                    name = "Executor Info",
+                    value = "```"..getExecutorInfo().."```",
+                    inline = false
+                }
+            },
+            footer = {
+                text = os.date("%Y-%m-%d %H:%M:%S")
+            }
+        }
+    }
+
+    -- Payload Discord
+    local payload = {
+        embeds = embed,
+        username = "Console Monitor",
+    }
+
+    -- Kirim ke webhook (dengan error handling)
+    pcall(function()
+        local jsonPayload = HttpService:JSONEncode(payload)
+        (syn and syn.request or http_request or request)({
+            Url = WEBHOOK_URL,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = jsonPayload
+        })
+    end)
+end
+
+-- Fungsi untuk memproses log
+local function processMessage(message, messageType)
+    local errorType = 
+        messageType == Enum.MessageType.MessageError and "ERROR" or
+        messageType == Enum.MessageType.MessageWarning and "WARNING" or
+        "LOG"
+
+    -- Skip jika pesan sudah dikirim sebelumnya
+    local msgHash = HttpService:JSONEncode({msg=message, type=errorType})
+    if lastSentMessages[msgHash] then return end
+    lastSentMessages[msgHash] = true
+
+    -- Bersihkan cache setiap 5 menit
+    if #lastSentMessages > 50 then
+        lastSentMessages = {}
+    end
+
+    -- Kirim hanya ERROR/WARNING
+    if errorType ~= "LOG" then
+        sendToWebhook(errorType, message)
+    end
+end
+
+-- Hubungkan event listener
+LogService.MessageOut:Connect(processMessage)
+
+-- Notifikasi saat script aktif
+processMessage("Spectate Console...", "LOG")
 
 
 local Auto_Parry = {}
@@ -1444,52 +1567,43 @@ local Toggle = Tab.Main:AddToggle("MyToggle",
         if state then
             Connections_Manager['Auto Spam'] = RunService.PreSimulation:Connect(function()
                 local Ball = Auto_Parry.Get_Ball()
-                if not Ball then
-                    return
-                end
+                if not Ball then return end
         
                 local Zoomies = Ball:FindFirstChild('zoomies')
-                if not Zoomies then
-                    return
+                if not Zoomies then return end
+        
+                -- Hitung kecepatan bola (Magnitude VectorVelocity)
+                local Ball_Speed = Zoomies.VectorVelocity.Magnitude
+        
+                -- Cooldown dinamis: 
+                -- - Jika bola LAMBAT (speed < 100), cooldown = 0.5 detik (default)
+                -- - Jika bola CEPAT (speed > 100), cooldown = 0.1 - 0.3 detik (tergantung kecepatan)
+                local Dynamic_Cooldown = math.clamp(0.5 - (Ball_Speed / 500), 0.1, 0.5)
+        
+                -- Cek apakah cooldown sudah selesai
+                if (tick() - Last_Parry) < Dynamic_Cooldown then
+                    return  -- Skip jika masih dalam cooldown
                 end
-                
+        
+                -- Lanjutkan dengan logika parry
                 Auto_Parry.Closest_Player()
-                local Ping = game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue()
-                local Ping_Threshold = math.clamp(Ping / 10, 10, 16)
-                
                 local Ball_Properties = Auto_Parry:Get_Ball_Properties()
                 local Entity_Properties = Auto_Parry:Get_Entity_Properties()
-        
-                local spam_delay = 0.001
                 local spam_accuracy = Auto_Parry.Spam_Service({
                     Ball_Properties = Ball_Properties,
                     Entity_Properties = Entity_Properties,
-                    Ping = Ping_Threshold,
+                    Ping = math.clamp(game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue() / 10, 10, 16),
                     Spam_Sensitivity = Auto_Parry.Spam_Sensitivity,
                     Ping_Based_Spam = Auto_Parry.Ping_Based_Spam
                 })
         
+                -- Cek kondisi parry
                 local Distance = Player:DistanceFromCharacter(Ball.Position)
-                local Target_Position = Closest_Entity.PrimaryPart.Position
-                local Target_Distance = Player:DistanceFromCharacter(Target_Position)
-                
-                local Direction = (Player.Character.PrimaryPart.Position - Ball.Position).Unit
-                local Ball_Direction = Zoomies.VectorVelocity.Unit
-                local Dot = Direction:Dot(Ball_Direction)
-        
                 local Ball_Target = Alive:FindFirstChild(Ball:GetAttribute('target'))
-                if not Ball_Target then
-                    return
-                end
         
-                local Ball_Targeted_Distance = Player:DistanceFromCharacter(Ball_Target.PrimaryPart.Position)
-                if Target_Distance > spam_accuracy or Distance > spam_accuracy then
-                    return
-                end
-        
-                if Distance <= spam_accuracy and Parries > 1 then
+                if Ball_Target and Distance <= spam_accuracy and Parries > 1 then
                     Auto_Parry.Parry(Selected_Parry_Type)
-                    task.wait(spam_delay)
+                    Last_Parry = tick()  -- Reset cooldown timer
                 end
             end)
         else
@@ -1497,8 +1611,7 @@ local Toggle = Tab.Main:AddToggle("MyToggle",
                 Connections_Manager['Auto Spam']:Disconnect()
                 Connections_Manager['Auto Spam'] = nil
             end
-        end
-            end   
+        end  
 })
 
 local Toggle = Tab.Main:AddToggle("MyToggle", 
