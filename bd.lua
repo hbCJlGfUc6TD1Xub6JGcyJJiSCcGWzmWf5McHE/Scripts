@@ -1523,18 +1523,18 @@ local Toggle = Tab.Main:AddToggle("MyToggle",
 
 local Dropdown = Tab.Main:AddDropdown("Dropdown", {
     Title = "Curve Method",
-    Description = "self explain i dont have idea",
+    Description = "do not use Custom, or the auto parry will no work",
     Values = {"Custom", "Random", "Backwards", "Straight", "Up", "Right", "Left"},
     Multi = false,
-    Default = 1,
+    Default = 3,
     Callback = function(slctd)
         -- Ensure the selected type is valid
         local validTypes = {"Custom", "Random", "Backwards", "Straight", "Up", "Right", "Left"}
         if table.find(validTypes, slctd) then
             Selected_Parry_Type = slctd
         else
-            Selected_Parry_Type = "Custom"
-            warn("Invalid parry type selected, defaulting to Custom")
+            Selected_Parry_Type = "Backwards"
+            warn("Invalid parry type selected, defaulting to Backwards")
         end
     end
 })
