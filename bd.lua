@@ -155,7 +155,6 @@ function Auto_Parry.Parry_Data(Parry_Type)
     local baseData = {0, Camera.CFrame, Events, Vector2_Mouse_Location}
     
     local directionMap = {
-        ['Custom'] = function() return baseData end,
         ['Backwards'] = function() 
             return {0, CFrame.new(Camera.CFrame.Position, Camera.CFrame.Position - (Camera.CFrame.LookVector * 1000)), Events, Vector2_Mouse_Location}
         end,
@@ -1523,13 +1522,13 @@ local Toggle = Tab.Main:AddToggle("MyToggle",
 
 local Dropdown = Tab.Main:AddDropdown("Dropdown", {
     Title = "Curve Method",
-    Description = "do not use Custom, or the auto parry will no work",
-    Values = {"Custom", "Random", "Backwards", "Straight", "Up", "Right", "Left"},
+    Description = "Fixed!",
+    Values = {"Random", "Backwards", "Straight", "Up", "Right", "Left"},
     Multi = false,
     Default = 3,
     Callback = function(slctd)
         -- Ensure the selected type is valid
-        local validTypes = {"Custom", "Random", "Backwards", "Straight", "Up", "Right", "Left"}
+        local validTypes = {"Random", "Backwards", "Straight", "Up", "Right", "Left"}
         if table.find(validTypes, slctd) then
             Selected_Parry_Type = slctd
         else
